@@ -26,7 +26,7 @@ class Proveedor(models.Model):
     )
     email = models.EmailField(
         verbose_name="Persona de contacto", 
-        null=False
+        null=True
     )
     dirección = models.CharField(
         verbose_name="Número de contacto", 
@@ -38,14 +38,11 @@ class Proveedor(models.Model):
 
 class Productos(models.Model):
 
-    Id = models.UUIDField(
-        verbose_name= 'ID', 
-        unique= True
-    )
     nombre = models.CharField(
         verbose_name = 'Nombre del producto', 
         max_length=30, 
-        null=False)
+        null=False
+    )
     categoria = models.EmbeddedField(model_container=Categoria)
     proveedor = models.EmbeddedField(model_container=Proveedor)
     descripcion = models.CharField(
@@ -58,3 +55,7 @@ class Productos(models.Model):
         max_digits=10, 
         decimal_places=2,
     )
+    cantidad = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        abstract = True
