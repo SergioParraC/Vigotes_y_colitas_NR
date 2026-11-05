@@ -4,10 +4,26 @@ from ..meeting import models as meetings
 from ..inventory import models as product
 
 class FacturaDetalle(models.Model):
-    cita = models.EmbeddedField(model_container=meetings.Citas)
-    vacuna = models.EmbeddedField(model_container=meetings.Vacunas)
-    producto = models.EmbeddedField(model_container=product.Productos)
-    descripción = models.CharField(
+    """
+    Contenedor de los ítems que se guardan dentro de ``Facturas``.
+    """
+
+    cita = models.EmbeddedField(
+        model_container=meetings.Citas,
+        null=True,
+        blank=True
+    )
+    vacuna = models.EmbeddedField(
+        model_container=meetings.Vacunas,
+        null=True,
+        blank=True
+    )
+    producto = models.EmbeddedField(
+        model_container=product.Productos,
+        null=True,
+        blank=True
+    )
+    descripcion = models.CharField(
         max_length=150,
         null=True
     )
@@ -15,8 +31,9 @@ class FacturaDetalle(models.Model):
         default=1,
         null=True
     )
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+    # Debuelve los valores que corresponde según se requiera
+    precio_unitario = models.FloatField()
+    subtotal = models.FloatField()
 
     class Meta:
             abstract = True
@@ -28,29 +45,29 @@ class Facturas(models.Model):
         PENDIENTE = 'PENDIENTE', 'Pendiente'
         PAGADA = 'PAGADA', 'Pagada'
         CANCELADA = 'CANCELADA', 'Cancelada'
+
+    _id = models.ObjectIdField()
     factura_detalle = models.ArrayField(model_container=FacturaDetalle)
     cliente = models.EmbeddedField(model_container=customers.Cliente)
     fecha = models.DateTimeField(null=False)
-    subtotal = models.DecimalField(
-        max_digits=12, 
-        decimal_places=2, 
+    subtotal = models.FloatField(
         default=0
     )
-    iva = models.DecimalField(
-        max_digits=2, 
-        decimal_places=2, 
+    iva = models.FloatField(
         default=0
     )
-    total = models.DecimalField(
-        max_digits=12, 
-        decimal_places=2, 
+    total = models.FloatField(
         default=0
     )
     estado = models.CharField(
         max_length=20, 
-        choices=EstadosFactura, 
+        choices=EstadosFactura.choices, 
         default=EstadosFactura.BORRADOR
     )
 
     class Meta:
-            abstract = True
+        db_table = 'facturas'
+
+    def __str__(self):
+        return f'Factura {self.pk} - {self.estado}'
+

@@ -1,0 +1,38 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<h1>Listado de facturas realizadas</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <p style="color: green; font-size: 20px;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+{% if facturas %}
+<table>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Imprimir</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fac in facturas %}
+            <tr>
+                <td>{{ fac.cliente.nombre }} {{ fac.cliente.apellido }}</td>
+                <td>{{ fac.fecha }}</td>
+                <td>{{ fac.estado }}</td>
+                <td>${{ fac.total }}</td>
+                <td><a href="{% url 'billing:generar_pdf_factura' fac.pk %}"><button type="button" style="background-color: #0f5f55;">PDF</button></a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay facturas registradas.</p>
+{% endif %}
+{% endblock %}

@@ -125,6 +125,11 @@
 		<p style="font-size: 16px; color: #4b5563;">{{ Total }} productos disponibles</p>
 	</div>
     {% include "filtro_productos.html" %}
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
     {% if mensaje %}
         <p style="color: green;">{{ mensaje }}</p>
     {% endif %}
@@ -156,7 +161,15 @@
 
 				<div class="product-actions">
 					<a href="{% url 'inventario:detalle_producto_cliente' producto.pk %}"><button type="button">Ver mas</button></a>
-					{% comment %} El boton de compra depende del modulo de facturacion que aun no esta migrado {% endcomment %}
+					{% if producto.stock > 0 %}
+						<form method="post" action="{% url 'billing:añadir_item_inventario' producto.pk %}" class="buy-form-inline">
+							{% csrf_token %}
+							<div class="buy-form-row">
+								<input type="number" name="cantidad" min="1" max="{{ producto.stock }}" value="1" required class="buy-qty-input">
+								<button type="submit" class="buy-btn">Comprar</button>
+							</div>
+						</form>
+					{% endif %}
 				</div>
 			</div>
 		</article>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura #{{ factura.pk }}</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 15px;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div>
+            <div>
+                <div>Factura #{{ factura.pk }}</div>
+                <div>Fecha: {{ factura.fecha|date:'d/m/Y H:i' }}</div>
+                <div>Estado: {{ factura.get_estado_display }}</div>
+            </div>
+            <div>
+                <div>Veterinaria Vida Animal</div>
+                <div>Dirección: Calle 69 bis # 111 A - 46</div>
+                <div>Tel: 320 363 3542</div>
+            </div>
+        </div>
+
+        <div>
+            <span>Cliente:</span>
+            <p>Nombre: {{ factura.cliente.nombre }} {{ factura.cliente.apellido }}</p><br>
+            <p>Documento: {{ factura.cliente.numero_documeto }}</p><br>
+            <p>Dirección: {{ factura.cliente.direccion }}</p><br>
+            <p>Tel: {{ factura.cliente.telefono }}</p><br>
+            <p>Email: {{ factura.cliente.email }}</p><br>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles %}
+                <tr>
+                    <td>{{ detalle.descripcion }}</td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>$ {{ detalle.precio_unitario }}</td>
+                    <td>$ {{ detalle.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table>
+            <tr>
+                <td>Subtotal:</td>
+                <td>$ {{ factura.subtotal }}</td>
+            </tr>
+            <tr>
+                <td>IVA (19%):</td>
+                <td>$ {{ factura.iva }}</td>
+            </tr>
+            <tr>
+                <td>Total:</td>
+                <td>$ {{ factura.total }}</td>
+            </tr>
+        </table>
+        <div style="clear: both;"></div>
+    </div>
+</body>
+</html>

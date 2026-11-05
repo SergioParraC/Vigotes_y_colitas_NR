@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<h1>Listado de productos en tu carrito</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <p style="color: green; font-size: 20px;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+{% if detalles %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in detalles %}
+            <tr>
+                <td>{{ detalle.descripcion }}</td>
+                <td>{{ detalle.cantidad }}</td>
+                <td>${{ detalle.precio_unitario }}</td>
+                <td>${{ detalle.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Total: ${{ total }}</h2>
+    <a href="{% url 'billing:finalizar_compra' %}"><button type="button" style="background-color: #0f5f55;">Proceder al pago</button></a>
+{% else %}
+    <p>Tu carrito está vacío.</p>
+    <a href="{% url 'inventario:productos_cliente' %}"><button type="button" style="margin-top: 10px;">Ir al catálogo</button></a>
+{% endif %}
+
+{% endblock %}

@@ -8,6 +8,7 @@ from datetime import datetime
 from io import BytesIO
 from xhtml2pdf import pisa
 from . import forms
+from ..billing import models as billing
 
 
 def _a_object_id(id_texto):
@@ -34,12 +35,15 @@ def _obtener_documento(modelo, id_texto):
 
 # Se dejan comentarios en productos, ya que es la base para el resto de elementos
 
-'''El carrito de compras pertenece al módulo de facturación, todavía no migrado a este proyecto'''
+'''El carrito de compras vive en el módulo de facturación (Aplicaciones.billing)'''
 def _obtener_cantidad_carrito():
-    # TODO: cuando se migre el módulo de facturación se contarán los ítems del
-    # carrito (FacturaDetalle) desde Mongo. Por ahora ese módulo no existe en
-    # este proyecto y se informa cero elementos.
-    return 0
+    """Cuenta los ítems que hay en el carrito: la factura en estado BORRADOR."""
+    factura = billing.Facturas.objects.filter(
+        estado=billing.Facturas.EstadosFactura.BORRADOR
+    ).first()
+    if not factura:
+        return 0
+    return len(factura.factura_detalle or [])
 
 
 '''Listado de categorias'''

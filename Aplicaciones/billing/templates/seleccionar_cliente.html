@@ -1,0 +1,25 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<h1>Seleccionar cliente</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <p style="color: green; font-size: 20px;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+{% if mensaje %}
+    <p style="color: green; font-size: 20px;">{{ mensaje }}</p>
+{% endif %}
+
+<h1 style="font-size: 24px; margin-bottom: 16px;">Selecciona el cliente para la compra</h1>
+<div class="form-container">
+	<form method="post" action="{% url 'billing:seleccionar_cliente' %}">
+		{% csrf_token %}
+
+		<label>{{ formulario.cliente.label }}:</label>
+		{{ formulario.cliente }}
+		<button type="submit">Crear factura en borrador</button>
+	</form>
+</div>
+{% endblock %}

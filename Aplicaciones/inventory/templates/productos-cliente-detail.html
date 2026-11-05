@@ -123,7 +123,15 @@
             <div class="detail-actions">
                 <a href="{% url 'inventario:productos_cliente' %}"><button type="button">Volver al catálogo</button></a>
             </div>
-				{% comment %} El boton de compra depende del modulo de facturacion que aun no esta migrado {% endcomment %}
+			{% if producto.stock > 0 %}
+                <form method="post" action="{% url 'billing:añadir_item_inventario' producto.pk %}" class="buy-form-inline">
+                    {% csrf_token %}
+                    <div class="buy-form-row">
+                        <input type="number" name="cantidad" min="1" max="{{ producto.stock }}" value="1" required class="buy-qty-input">
+                        <button type="submit" class="buy-btn">Comprar</button>
+                    </div>
+                </form>
+            {% endif %}
         </section>
     </div>
 </div>
