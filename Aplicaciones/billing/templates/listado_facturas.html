@@ -14,6 +14,7 @@
     <thead>
         <tr>
             <th>Cliente</th>
+            <th>Mascota</th>
             <th>Fecha</th>
             <th>Estado</th>
             <th>Total</th>
@@ -24,6 +25,7 @@
         {% for fac in facturas %}
             <tr>
                 <td>{{ fac.cliente.nombre }} {{ fac.cliente.apellido }}</td>
+                <td>{{ fac.mascota.nombre }}</td>
                 <td>{{ fac.fecha }}</td>
                 <td>{{ fac.estado }}</td>
                 <td>${{ fac.total }}</td>

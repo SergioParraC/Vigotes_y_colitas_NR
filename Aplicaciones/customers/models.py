@@ -2,11 +2,8 @@ from djongo import models
 from ..pets import models as pets
 
 class Cliente(models.Model):
-    """Colección 'clientes'.
-
-    Además de ser una colección propia (de aquí se eligen los clientes al
-    facturar), se usa como contenedor del campo embebido ``Facturas.cliente``,
-    igual que ``Categoria`` lo es de ``Productos.categoria``.
+    """
+    Colección 'clientes'.
     """
 
     class TipoDocumento(models.TextChoices):
@@ -48,8 +45,9 @@ class Cliente(models.Model):
     )
     direccion = models.CharField(
         verbose_name="Dirección", 
-        max_length=20, 
-        null=True
+        max_length=200, 
+        null=True,
+        blank=True
     )
 
     class Meta:
@@ -57,4 +55,36 @@ class Cliente(models.Model):
 
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
+
+
+class Contacto(models.Model):
+    """
+    Colección 'contactos': mensajes enviados desde el formulario de contacto.
+    """
+
+    _id = models.ObjectIdField()
+    nombre = models.CharField(
+        verbose_name='Nombre',
+        max_length=100,
+        null=False
+    )
+    numero_contacto = models.CharField(
+        verbose_name='Número de contacto',
+        max_length=20,
+        null=False
+    )
+    email = models.EmailField(
+        verbose_name='Correo electrónico',
+        null=False
+    )
+    mensaje = models.TextField(
+        verbose_name='Mensaje',
+        null=False
+    )
+
+    class Meta:
+        db_table = 'contactos'
+
+    def __str__(self):
+        return f'Contacto de {self.nombre} - {self.email}'
 

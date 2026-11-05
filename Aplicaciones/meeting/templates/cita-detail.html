@@ -1,0 +1,101 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<style>
+    .cita-card {
+        background: #ffffff;
+        border: 1px solid #b8ded7;
+        border-radius: 8px;
+        box-shadow: 0 4px 14px rgba(15,95,85,0.08);
+        padding: 32px 32px 24px 32px;
+        min-width: 350px;
+        max-width: 420px;
+        margin: 0 auto;
+        text-align: left;
+        box-sizing: border-box;
+    }
+
+    .cita-card .boton-eliminar {
+        background-color: rgb(185, 28, 28);
+    }
+
+    .cita-card .boton-eliminar:hover {
+        background-color: rgb(150, 22, 22);
+    }
+</style>
+
+    <h1>{{ titulo }}</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% if mensaje %}
+        <p style="color: green; font-size: 20px;">{{ mensaje }}</p>
+    {% endif %}
+
+    <a href="{% url 'citas:listado_citas' %}"><button type="button" style="background-color: rgb(20, 97, 5); color: white; margin-bottom: 10px;">Volver a citas</button></a>
+
+    <div class="cita-card">
+        <form method="POST">
+            {% csrf_token %}
+
+            <label for="mascota">Mascota:</label>
+            <select id="mascota" name="Mascota" required>
+                <option value="">Selecciona la mascota</option>
+                {% for valor, texto in mascotas %}
+                    <option value="{{ valor }}" {% if cita and cita.valor_mascota == valor %}selected{% endif %}>{{ texto }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="tipo">Tipo:</label>
+            <select id="tipo" name="Tipo" required>
+                {% for valor, texto in tipos %}
+                    <option value="{{ valor }}" {% if cita and cita.tipo == valor %}selected{% endif %}>{{ texto }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="FechaCita" value="{{ cita.fecha_cita|date:'Y-m-d'|default:'' }}" required>
+
+            <label for="hora">Hora:</label>
+            <input type="time" id="hora" name="HoraCita" value="{{ cita.hora_cita|time:'H:i'|default:'' }}" required>
+
+            <label for="estado">Estado:</label>
+            <select id="estado" name="Estado" required>
+                {% for valor, texto in estados %}
+                    <option value="{{ valor }}" {% if cita and cita.valor_estado == valor %}selected{% endif %}>{{ texto }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="motivo">Motivo de la cita:</label>
+            <input type="text" id="motivo" name="Motivo" value="{{ cita.motivo|default:'' }}" placeholder="Motivo de la cita">
+
+            <label for="sintomas">Síntomas:</label>
+            <textarea id="sintomas" name="Sintomas" placeholder="Síntomas de la Mascota">{{ cita.sintomas|default:'' }}</textarea>
+
+            <label for="notas">Notas adicionales:</label>
+            <textarea id="notas" name="Notas" placeholder="Notas Adicionales">{{ cita.notas|default:'' }}</textarea>
+
+            <label for="veterinario">Veterinario:</label>
+            <input type="text" id="veterinario" name="Veterinario" value="{{ cita.veterinario|default:'' }}" placeholder="Veterinario que atiende">
+
+            <button type="submit" style="background-color: rgb(20, 97, 5); color: white; margin-top: 10px;">{{ boton }}</button>
+        </form>
+
+        {% if cita.id %}
+        <form method="POST" action="{% url 'citas:eliminar_cita' cita.id %}" style="margin-top: 12px;" onsubmit="return confirmarEliminacion();">
+            {% csrf_token %}
+            <button type="submit" class="boton-eliminar">Eliminar cita</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <script>
+        function confirmarEliminacion() {
+            return confirm('¿Seguro que quieres eliminar la cita de {{ cita.mascota|default:"esta mascota" }}?');
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<style>
+    .page-head {
+        text-align: left;
+        background: #ffffff;
+        border: 1px solid #b8ded7;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 4px 14px rgba(15,95,85,0.08);
+        max-width: 1100px;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+
+    .page-head h2 {
+        font-size: 34px;
+        margin: 0 0 12px;
+        color: #0f5f55;
+    }
+
+    .page-head p {
+        font-size: 19px;
+        line-height: 1.5;
+        margin: 0 0 18px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .summary {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .summary-item {
+        background: #e8f6f2;
+        border: 1px solid #b8ded7;
+        border-radius: 8px;
+        padding: 14px;
+        text-align: center;
+    }
+
+    .summary-item strong {
+        display: block;
+        font-size: 30px;
+        color: #0f5f55;
+    }
+
+    .summary-item span {
+        font-size: 16px;
+    }
+
+    .workflow {
+        max-width: 1100px;
+        margin: 24px auto 0;
+        background: #ffffff;
+        border: 1px solid #b8ded7;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: left;
+        box-shadow: 0 4px 14px rgba(15,95,85,0.08);
+        box-sizing: border-box;
+    }
+
+    .workflow h3 {
+        margin: 0 0 12px;
+        color: #0f5f55;
+        font-size: 24px;
+    }
+
+    .workflow ol {
+        margin: 0;
+        padding-left: 24px;
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    .section-title {
+        margin: 40px 0 0;
+        font-size: 30px;
+        color: #0f5f55;
+        text-align: center;
+    }
+
+    .tabla-mascotas {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .tabla-mascotas table {
+        width: 100%;
+    }
+
+    .tabla-mascotas th {
+        background: #e8f6f2;
+        color: #0f5f55;
+        text-align: left;
+    }
+
+    @media (max-width: 800px) {
+        .summary {
+            grid-template-columns: 1fr;
+        }
+
+        .page-head {
+            text-align: center;
+        }
+
+        .actions {
+            justify-content: center;
+        }
+    }
+</style>
+
+    <h1>{{ titulo }}</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <section class="page-head">
+        <h2>Información de mascotas</h2>
+        <p>
+            En esta sección se organiza la información de clientes, mascotas,
+            citas, vacunas e historial médico para brindar una atención más
+            completa.
+        </p>
+
+        <div class="actions">
+            <a href="{% url 'pets:crear_mascota' %}"><button>Registrar cliente y mascota</button></a>
+            <a href="{% url 'pets:crear_vacuna' %}"><button>Registrar vacuna</button></a>
+            <a href="{% url 'pets:crear_historial' %}"><button>Registrar historial</button></a>
+        </div>
+
+        <div class="summary">
+            <div class="summary-item">
+                <strong>{{ total_duenos }}</strong>
+                <span>Clientes</span>
+            </div>
+            <div class="summary-item">
+                <strong>{{ total_mascotas }}</strong>
+                <span>Mascotas</span>
+            </div>
+            <div class="summary-item">
+                <strong>{{ total_citas }}</strong>
+                <span>Citas</span>
+            </div>
+            <div class="summary-item">
+                <strong>{{ total_vacunas }}</strong>
+                <span>Vacunas</span>
+            </div>
+            <div class="summary-item">
+                <strong>{{ total_historiales }}</strong>
+                <span>Historiales</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="workflow">
+        <h3>Pasos para registrar una mascota</h3>
+        <ol>
+            <li>Registrar o seleccionar el cliente responsable de la mascota.</li>
+            <li>Completar la información básica de la mascota.</li>
+            <li>Guardar el registro para dejar la mascota asociada a su cliente.</li>
+        </ol>
+    </section>
+
+    <h2 class="section-title">Mascotas registradas</h2>
+
+    <div class="tabla-mascotas">
+        <table>
+            <tr>
+                <th>Nombre</th>
+                <th>Cliente</th>
+                <th>Especie</th>
+                <th>Raza</th>
+                <th>Edad</th>
+                <th>Vacunado</th>
+                <th>Historia</th>
+            </tr>
+            {% for mascota in mascotas %}
+            <tr>
+                <td>{{ mascota.nombre }}</td>
+                <td>{{ mascota.cliente }}</td>
+                <td>{{ mascota.especie }}</td>
+                <td>{{ mascota.raza }}</td>
+                <td>{{ mascota.edad }}</td>
+                <td>
+                    {% if mascota.vacunado %}
+                        Sí
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td><a href="{% url 'pets:historia_mascota' mascota.id %}"><button>Ver historia</button></a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No hay mascotas registradas.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}
+

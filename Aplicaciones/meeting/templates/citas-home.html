@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+    <h1>{{ titulo }}</h1>
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <p style="color: green; font-size: 20px;">{{ message }}</p>
+            {% else %}
+                <p style="color: rgb(185, 28, 28); font-size: 20px;">{{ message }}</p>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div style="margin-bottom: 10px;">
+        <a href="{% url 'citas:crear_cita' %}"><button style="background-color: rgb(20, 97, 5); color: white;">Añadir</button></a>
+        <a href="{% url 'citas:buscar_cita' %}"><button style="background-color: rgb(20, 97, 5); color: white;">Filtrar</button></a>
+    </div>
+
+    <div style="display: inline-block; margin-left: auto; margin-right: auto;">
+        <table>
+            <tr>
+                <th>Mascota</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
+                <th>Editar</th>
+            </tr>
+            {% for c in Citas %}
+            <tr>
+                <td>{{ c.mascota }}</td>
+                <td>{{ c.cliente }}</td>
+                <td>{{ c.telefono }}</td>
+                <td>{{ c.email }}</td>
+                <td>{{ c.tipo_display }}</td>
+                <td>{{ c.fecha_cita|date:'Y-m-d' }}</td>
+                <td>{{ c.hora_cita|time:'H:i' }}</td>
+                <td>{{ c.estado }}</td>
+                <td><a href="{% url 'citas:detalle_cita' c.id %}"><button>Editar</button></a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9">No hay citas registradas.</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p style="font-size: 26px; text-align: left;"><strong>Total de citas: {{ Total }}</strong></p>
+    </div>
+{% endblock %}

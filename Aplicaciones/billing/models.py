@@ -2,6 +2,7 @@ from djongo import models
 from ..customers import models as customers
 from ..meeting import models as meetings
 from ..inventory import models as product
+from ..pets import models as pets
 
 class FacturaDetalle(models.Model):
     """
@@ -49,6 +50,11 @@ class Facturas(models.Model):
     _id = models.ObjectIdField()
     factura_detalle = models.ArrayField(model_container=FacturaDetalle)
     cliente = models.EmbeddedField(model_container=customers.Cliente)
+    mascota = models.EmbeddedField(
+        model_container=pets.Mascotas,
+        null=True,
+        blank=True
+    )
     fecha = models.DateTimeField(null=False)
     subtotal = models.FloatField(
         default=0

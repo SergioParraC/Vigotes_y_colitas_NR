@@ -1,0 +1,32 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+    <h1>Filtrar citas</h1>
+
+    <a href="{% url 'citas:listado_citas' %}"><button type="button" style="background-color: rgb(20, 97, 5); color: white; margin-bottom: 10px;">Volver a citas</button></a>
+
+    <div class="form-container">
+        <form method="GET" action="{% url 'citas:filtrar_citas' %}">
+            <label for="nombre">Nombre de la mascota:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Buscar por nombre de mascota">
+
+            <label for="tipo">Tipo:</label>
+            <select id="tipo" name="tipo">
+                <option value="">Todos</option>
+                {% for valor, texto in tipos %}
+                    <option value="{{ valor }}">{{ texto }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="estado">Estado:</label>
+            <select id="estado" name="estado">
+                <option value="">Todos</option>
+                {% for valor, texto in estados %}
+                    <option value="{{ valor }}">{{ texto }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" style="margin-top: 10px;">Buscar</button>
+        </form>
+    </div>
+{% endblock %}

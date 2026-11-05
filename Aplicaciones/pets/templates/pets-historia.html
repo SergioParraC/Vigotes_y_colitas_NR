@@ -1,0 +1,186 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<style>
+    .historia {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .page-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+
+    .page-bar h1 {
+        margin: 0;
+        text-align: left;
+    }
+
+    .panel {
+        background: #ffffff;
+        border: 1px solid #b8ded7;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 18px;
+        text-align: left;
+        box-shadow: 0 4px 14px rgba(15,95,85,0.08);
+    }
+
+    .panel h2 {
+        margin: 0 0 12px;
+        color: #0f5f55;
+        font-size: 26px;
+    }
+
+    .panel p {
+        font-size: 18px;
+        line-height: 1.4;
+        margin: 6px 0;
+    }
+
+    .panel table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        background: #ffffff;
+    }
+
+    .panel th, .panel td {
+        border: 1px solid #b8ded7;
+        padding: 10px;
+        font-size: 17px;
+        text-align: left;
+    }
+
+    .panel th {
+        background: #e8f6f2;
+        color: #0f5f55;
+    }
+
+    .panel .empty {
+        color: #607d78;
+        font-size: 17px;
+        margin: 0 0 12px;
+    }
+</style>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <div class="historia">
+        <div class="page-bar">
+            <h1>{{ titulo }}</h1>
+            <a href="{% url 'pets:listado_mascotas' %}"><button type="button">Volver a mascotas</button></a>
+        </div>
+
+        <section class="panel">
+            <h2>Datos de la mascota</h2>
+            <p><strong>Nombre:</strong> {{ mascota.nombre }}</p>
+            <p><strong>Dueño:</strong> {{ cliente.nombre }} {{ cliente.apellido }}</p>
+            <p><strong>Documento:</strong> {{ cliente.tipo_documento }} {{ cliente.numero_documeto }}</p>
+            <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+            <p><strong>Correo:</strong> {{ cliente.email }}</p>
+            <p><strong>Especie:</strong> {{ mascota.especie }}</p>
+            <p><strong>Raza:</strong> {{ mascota.raza }}</p>
+            <p><strong>Edad:</strong> {{ edad }}</p>
+            <p><strong>Peso:</strong> {{ mascota.peso }}</p>
+            <p><strong>Vacunado:</strong>
+                {% if mascota.vacunado %}
+                    Sí
+                {% else %}
+                    No
+                {% endif %}
+            </p>
+            <a href="{% url 'pets:editar_mascota' mascota.id %}"><button type="button">Editar datos</button></a>
+        </section>
+
+        <section class="panel">
+            <h2>Citas</h2>
+            {% if citas %}
+                <table>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Tipo</th>
+                        <th>Síntomas</th>
+                        <th>Estado</th>
+                    </tr>
+                    {% for cita in citas %}
+                    <tr>
+                        <td>{{ cita.fecha|date:'Y-m-d' }}</td>
+                        <td>{{ cita.hora_cita|time:'H:i' }}</td>
+                        <td>{{ cita.tipo }}</td>
+                        <td>{{ cita.sintomas|default:"Sin síntomas registrados" }}</td>
+                        <td>{{ cita.estado }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="empty">No hay citas registradas.</p>
+            {% endif %}
+            <a href="{% url 'citas:crear_cita' %}"><button type="button" style="margin-top: 12px;">Agendar cita</button></a>
+        </section>
+
+        <section class="panel">
+            <h2>Vacunas</h2>
+            {% if vacunas %}
+                <table>
+                    <tr>
+                        <th>Vacuna</th>
+                        <th>Fecha</th>
+                        <th>Veterinario</th>
+                        <th>Acciones</th>
+                    </tr>
+                    {% for vacuna in vacunas %}
+                    <tr>
+                        <td>{{ vacuna.nombre_vacuna }}</td>
+                        <td>{{ vacuna.fecha_aplicacion }}</td>
+                        <td>{{ vacuna.veterinario }}</td>
+                        <td><a href="{% url 'pets:editar_vacuna' vacuna.id %}"><button type="button">Editar</button></a></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="empty">No hay vacunas registradas.</p>
+            {% endif %}
+            <a href="{% url 'pets:crear_vacuna' %}"><button type="button" style="margin-top: 12px;">Registrar vacuna</button></a>
+        </section>
+
+        <section class="panel">
+            <h2>Historial médico</h2>
+            {% if historiales %}
+                <table>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Motivo</th>
+                        <th>Diagnóstico</th>
+                        <th>Tratamiento</th>
+                        <th>Acciones</th>
+                    </tr>
+                    {% for historial in historiales %}
+                    <tr>
+                        <td>{{ historial.fecha_visita }}</td>
+                        <td>{{ historial.motivo_visita }}</td>
+                        <td>{{ historial.diagnostico }}</td>
+                        <td>{{ historial.tratamiento }}</td>
+                        <td><a href="{% url 'pets:editar_historial' historial.id %}"><button type="button">Editar</button></a></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="empty">No hay historial médico registrado.</p>
+            {% endif %}
+            <a href="{% url 'pets:crear_historial' %}"><button type="button" style="margin-top: 12px;">Registrar historial</button></a>
+        </section>
+    </div>
+
+{% endblock %}

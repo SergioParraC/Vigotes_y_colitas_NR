@@ -1,0 +1,96 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<style>
+    .page-bar {
+        max-width: 760px;
+        margin: 0 auto 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .page-bar h1 {
+        margin: 0;
+        text-align: left;
+    }
+
+    .form-mascota {
+        max-width: 760px;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #b8ded7;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 4px 14px rgba(15,95,85,0.08);
+        text-align: left;
+        box-sizing: border-box;
+    }
+
+    .form-section {
+        border: 1px solid #b8ded7;
+        border-radius: 8px;
+        padding: 18px;
+        margin-bottom: 18px;
+        background: #fbfffd;
+        text-align: left;
+    }
+
+    .form-section h2 {
+        margin: 0 0 14px;
+        color: #0f5f55;
+        font-size: 24px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+
+    .form-mascota p {
+        margin: 0 0 14px;
+    }
+</style>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% if mensaje %}
+        <p style="color: green; font-size: 20px;">{{ mensaje }}</p>
+    {% endif %}
+
+    <div class="page-bar">
+        <h1>{{ titulo }}</h1>
+        <a href="{{ url_cancelar }}"><button type="button">Volver</button></a>
+    </div>
+
+    <div class="form-mascota">
+        <form method="POST">
+            {% csrf_token %}
+
+            <section class="form-section">
+                <h2>Datos del dueño</h2>
+                {{ formulario_dueno.as_p }}
+            </section>
+
+            <section class="form-section">
+                <h2>Datos de la mascota</h2>
+                {{ formulario_mascota.as_p }}
+            </section>
+
+            <div class="form-actions">
+                <button type="submit">{{ boton }}</button>
+                <a href="{{ url_cancelar }}"><button type="button">Cancelar</button></a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+

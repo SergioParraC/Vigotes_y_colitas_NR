@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+    <h1>{{ titulo }}</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% if mensaje %}
+        <p style="color: green; font-size: 20px;">{{ mensaje }}</p>
+    {% endif %}
+
+    <a href="{{ url_cancelar }}"><button type="button" style="margin-bottom: 10px;">Volver</button></a>
+
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            {{ formulario.as_p }}
+            <button type="submit" style="margin-top: 10px;">{{ boton }}</button>
+        </form>
+    </div>
+
+{% endblock %}

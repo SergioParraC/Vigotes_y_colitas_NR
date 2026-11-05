@@ -37,6 +37,16 @@
             <p>Email: {{ factura.cliente.email }}</p><br>
         </div>
 
+        <div>
+            <span>Mascota:</span>
+            {% if factura.mascota %}
+                <p>Nombre: {{ factura.mascota.nombre }}</p>
+                <p>Especie: {{ factura.mascota.especie }}</p>
+            {% else %}
+                <span style="color:#dc2626;">Sin mascota asociada</span>
+            {% endif %}
+        </div>
+
         <table>
             <thead>
                 <tr>

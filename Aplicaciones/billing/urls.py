@@ -4,6 +4,7 @@ from . import views
 app_name = "billing"
 urlpatterns = [
     path('seleccionar-cliente/', views.seleccionar_cliente, name='seleccionar_cliente'),
+    path('seleccionar-mascota/', views.seleccionar_mascota, name='seleccionar_mascota'),
     path('anadir-item-inventario/<str:id_producto>/', views.anadirItemInventario, name='añadir_item_inventario'),
     path('mostrar-carrito/', views.mostrar_carrito, name='mostrar_carrito'),
     path('finalizar-compra/', views.finalizar_compra, name='finalizar_compra'),
