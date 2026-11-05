@@ -1,123 +1,66 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-
-<style>
-    .home-wrap {
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 38px 24px;
-        box-sizing: border-box;
-    }
-
-    .hero {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 28px;
-        align-items: center;
-        text-align: left;
-    }
-
-    .hero-text h2 {
-        font-size: 42px;
-        margin: 0 0 16px;
-        color: #0f5f55;
-    }
-
-    .hero-text p {
-        font-size: 21px;
-        line-height: 1.5;
-        margin: 0 0 18px;
-    }
-
-    .hero-image img {
-        width: 100%;
-        max-height: 360px;
-        object-fit: cover;
-        border-radius: 12px;
-        box-shadow: 0 8px 22px rgba(15,95,85,0.18);
-    }
-
-    .section-title {
-        margin-top: 44px;
-        font-size: 30px;
-        color: #0f5f55;
-    }
-
-    .services {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-top: 18px;
-    }
-
-    .service {
-        background: #ffffff;
-        border: 1px solid #b8ded7;
-        border-radius: 8px;
-        padding: 18px;
-        box-shadow: 0 4px 14px rgba(15,95,85,0.08);
-    }
-
-    .service h3 {
-        margin: 0 0 8px;
-        font-size: 22px;
-        color: #0f5f55;
-    }
-
-    .service p {
-        margin: 0;
-        font-size: 18px;
-        line-height: 1.4;
-    }
-
-    @media (max-width: 800px) {
-        .hero {
-            grid-template-columns: 1fr;
-            text-align: center;
-            gap: 14px;
-        }
-
-        .hero-text {
-            text-align: center;
-        }
-
-        .services {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<div class="home-wrap">
-    <section class="hero">
-        <div class="hero-text">
-            <h2>Cuidamos la salud de tus mascotas</h2>
-            <p>
-                En Veterinaria Vida Animal ofrecemos atención cercana, responsable y pensada para el bienestar de perros, gatos y otros animales de compañía.
-            </p>
-            <a href="{% url 'inventario:productos_cliente' %}"><button>Ver productos</button></a>
+{% include 'home-styles.html' %}
+<main class="inicio-contenedor">
+    <section class="inicio-hero">
+        <div class="inicio-hero-texto">
+            <span class="inicio-etiqueta">🐾 Bienestar en cada etapa</span>
+            <h1>Cuidamos a quienes hacen tu vida <span>más feliz.</span></h1>
+            <p>Atención veterinaria cercana, seguimiento clínico y productos para acompañar la salud de tu mascota todos los días.</p>
+            <div class="inicio-acciones">
+                <a class="inicio-boton" href="{% url 'citas:crear_cita' %}">＋ Agendar una cita</a>
+                <a class="inicio-boton inicio-boton--secundario" href="{% url 'inventario:productos_cliente' %}">Ver productos →</a>
+            </div>
+            <div class="inicio-beneficios">
+                <span><i>✓</i> Atención integral</span>
+                <span><i>✓</i> Historia clínica organizada</span>
+                <span><i>✓</i> Seguimiento personalizado</span>
+            </div>
         </div>
-        <div class="hero-image">
-            <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=900&q=80" alt="Veterinaria atendiendo una mascota">
+        <div class="inicio-hero-imagen">
+            <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1000&q=85" alt="Profesional veterinaria atendiendo a una mascota">
+            <div class="inicio-imagen-tarjeta">
+                <strong>Tu mascota, en buenas manos</strong>
+                <span>Consulta, vacunación, control y cuidado preventivo en un solo lugar.</span>
+            </div>
         </div>
     </section>
 
-    <h2 class="section-title">Nuestros servicios</h2>
-    <section class="services">
-        <article class="service">
-            <h3>Consulta general</h3>
-            <p>Revisión médica, orientación y seguimiento para mantener a tu mascota saludable.</p>
-        </article>
-        <article class="service">
-            <h3>Vacunación</h3>
-            <p>Aplicación y control de vacunas según la edad y necesidades de cada mascota.</p>
-        </article>
-        <article class="service">
-            <h3>Productos</h3>
-            <p>Catálogo de productos disponibles para el cuidado diario de tus animales.</p>
-        </article>
+    <section class="inicio-estadisticas" aria-label="Resumen de la veterinaria">
+        <article class="inicio-estadistica"><div class="inicio-estadistica-icono">👥</div><div><strong>{{ total_clientes }}</strong><span>Propietarios</span></div></article>
+        <article class="inicio-estadistica"><div class="inicio-estadistica-icono">🐾</div><div><strong>{{ total_mascotas }}</strong><span>Pacientes</span></div></article>
+        <article class="inicio-estadistica"><div class="inicio-estadistica-icono">📅</div><div><strong>{{ total_citas }}</strong><span>Citas registradas</span></div></article>
+        <article class="inicio-estadistica"><div class="inicio-estadistica-icono">🛍</div><div><strong>{{ total_productos }}</strong><span>Productos</span></div></article>
+        <article class="inicio-estadistica"><div class="inicio-estadistica-icono">🧾</div><div><strong>{{ total_facturas }}</strong><span>Facturas</span></div></article>
     </section>
-</div>
 
+    <section class="inicio-seccion">
+        <div class="inicio-seccion-cabecera">
+            <div><small>Gestión sencilla</small><h2>Todo lo que necesitas, en un lugar</h2></div>
+            <p>Accede rápidamente a cada área de la veterinaria y mantén la información organizada.</p>
+        </div>
+        <div class="inicio-modulos">
+            <a class="inicio-modulo" href="{% url 'pets:listado_mascotas' %}"><span class="inicio-modulo-icono">🐶</span><span class="inicio-modulo-flecha">→</span><h3>Mascotas</h3><p>Pacientes, vacunas e historias clínicas.</p></a>
+            <a class="inicio-modulo" href="{% url 'citas:listado_citas' %}"><span class="inicio-modulo-icono">📆</span><span class="inicio-modulo-flecha">→</span><h3>Agenda de citas</h3><p>Programa y consulta las próximas atenciones.</p></a>
+            <a class="inicio-modulo" href="{% url 'inventario:productos_cliente' %}"><span class="inicio-modulo-icono">🛍</span><span class="inicio-modulo-flecha">→</span><h3>Catálogo</h3><p>Productos disponibles para cada necesidad.</p></a>
+            <a class="inicio-modulo" href="{% url 'inventario:listado_productos' %}"><span class="inicio-modulo-icono">📦</span><span class="inicio-modulo-flecha">→</span><h3>Inventario</h3><p>Control de existencias, categorías y proveedores.</p></a>
+            <a class="inicio-modulo" href="{% url 'billing:listar_facturas' %}"><span class="inicio-modulo-icono">🧾</span><span class="inicio-modulo-flecha">→</span><h3>Facturación</h3><p>Facturas, compras y seguimiento de pagos.</p></a>
+        </div>
+    </section>
+
+    <section class="inicio-seccion">
+        <div class="inicio-seccion-cabecera"><div><small>Nuestros servicios</small><h2>Cuidado completo para tu mascota</h2></div></div>
+        <div class="inicio-servicios">
+            <article class="inicio-servicio"><span class="inicio-servicio-numero">01 — CONSULTA</span><h3>Medicina general</h3><p>Evaluación médica, orientación profesional y seguimiento para cuidar su bienestar.</p></article>
+            <article class="inicio-servicio"><span class="inicio-servicio-numero">02 — PREVENCIÓN</span><h3>Vacunación y controles</h3><p>Registro de vacunas y controles periódicos de acuerdo con cada etapa de vida.</p></article>
+            <article class="inicio-servicio"><span class="inicio-servicio-numero">03 — CUIDADO</span><h3>Productos especializados</h3><p>Alimentos, medicamentos e insumos seleccionados para el cuidado diario.</p></article>
+        </div>
+    </section>
+
+    <section class="inicio-cta">
+        <div><h2>¿Tu mascota necesita atención?</h2><p>Agenda una cita y conserva todo su seguimiento clínico organizado.</p></div>
+        <a class="inicio-boton" href="{% url 'citas:crear_cita' %}">Agendar ahora →</a>
+    </section>
+</main>
 {% endblock %}

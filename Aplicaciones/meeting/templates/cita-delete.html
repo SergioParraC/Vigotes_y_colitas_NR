@@ -1,0 +1,20 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+{% include 'citas-styles.html' %}
+<main class="citas-contenedor">
+    <section class="citas-confirmacion">
+        <h1>¿Eliminar esta cita?</h1>
+        <p>Vas a eliminar la cita de <strong>{{ cita.mascota }}</strong> con {{ cita.cliente }}.</p>
+        <p><strong>{{ cita.tipo_display }}</strong> · {{ cita.fecha_cita|date:'d/m/Y' }} a las {{ cita.hora_cita|time:'H:i' }}</p>
+        <p>Esta acción quitará la cita de la historia del paciente y no se puede deshacer.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="citas-acciones">
+                <button class="citas-boton citas-boton--peligro" type="submit">Sí, eliminar cita</button>
+                <a class="citas-boton citas-boton--secundario" href="{% url 'citas:detalle_cita' cita.id %}">Cancelar</a>
+            </div>
+        </form>
+    </section>
+</main>
+{% endblock %}

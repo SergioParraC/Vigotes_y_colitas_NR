@@ -16,58 +16,57 @@
             min-height: 100vh;
         }
 
-        header {
-            background: #0f5f55;
-            padding: 1rem 0;
-            box-shadow: 0 2px 14px rgba(15,95,85,0.18);
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0;
+            color: #ffffff;
+            background: rgba(11, 72, 64, .97);
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+            box-shadow: 0 5px 20px rgba(15, 74, 66, .17);
+            backdrop-filter: blur(12px);
         }
 
         .header-content {
-            max-width: 1200px;
+            width: min(1280px, 94%);
+            min-height: 72px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 18px;
-            padding: 0 24px;
+            gap: 22px;
         }
 
         .brand {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 16px;
+            gap: 11px;
             flex-shrink: 0;
+            color: #ffffff;
+            text-align: left;
+            text-decoration: none;
         }
 
-        .brand img {
-            height: 84px;
-            border-radius: 8px;
-            background-color: #ffffff;
-            padding: 4px;
+        .brand-mark {
+            display: grid;
+            width: 43px;
+            height: 43px;
+            place-items: center;
+            background: linear-gradient(145deg, #ffffff, #dff8f2);
+            border-radius: 12px;
+            box-shadow: 0 5px 14px rgba(0, 0, 0, .13);
+            font-size: 22px;
+            transform: rotate(-3deg);
         }
+
+        .brand-copy { display: flex; flex-direction: column; line-height: 1.08; }
+        .brand-copy strong { color: #ffffff; font-size: 17px; letter-spacing: -.02em; }
+        .brand-copy small { margin-top: 4px; color: rgba(255, 255, 255, .68); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
 
         h1 {
             color: #0f5f55;
             font-size: 34px;
-        }
-
-        header h1 {
-            margin: 0;
-            color: #ffffff;
-        }
-
-        nav {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            max-width: 260px;
-        }
-
-        nav button {
-            width: 100%;
-            padding: 8px 10px;
-            font-size: 16px;
         }
 
         .menu-toggle {
@@ -75,47 +74,74 @@
         }
 
         .menu-button {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 7px;
-            border: none;
-            background-color: #2f9e8f;
-            color: white;
-            font-size: 18px;
+            display: none;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 12px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .16);
+            border-radius: 9px;
+            font-size: 13px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(47,158,143,0.28);
         }
 
-        .menu {
-            position: relative;
-        }
+        .menu { position: relative; flex: 1; }
 
         .menu-links {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 44px;
-            width: 220px;
-            background: #ffffff;
-            border: 1px solid #b8ded7;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 8px 22px rgba(15,95,85,0.18);
-            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 3px;
         }
 
         .menu-links a {
-            display: block;
-            margin-bottom: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 9px 9px;
+            color: rgba(255, 255, 255, .78);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            text-decoration: none;
+            transition: color .15s ease, background .15s ease, transform .15s ease;
         }
 
-        .menu-links a:last-child {
-            margin-bottom: 0;
+        .menu-links a:hover,
+        .menu-links a.activo { color: #ffffff; background: rgba(255, 255, 255, .11); }
+        .menu-links a:hover { transform: translateY(-1px); }
+
+        .menu-links .agendar-link {
+            margin-left: 5px;
+            padding-inline: 13px;
+            color: #0b5148;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .11);
+        }
+        .menu-links .agendar-link:hover { color: #0b5148; background: #e8faf6; }
+
+        .menu-links .carrito-link { position: relative; padding-inline: 10px; font-size: 15px; }
+        .carrito-contador {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            display: grid;
+            min-width: 15px;
+            height: 15px;
+            padding: 0 2px;
+            place-items: center;
+            color: #ffffff;
+            background: #e15b5b;
+            border: 2px solid #0b5148;
+            border-radius: 999px;
+            box-sizing: border-box;
+            font-size: 8px;
+            font-weight: 800;
         }
 
-        .menu-toggle:checked + .menu-button + .menu-links {
-            display: block;
-        }
+        .menu-toggle:checked + .menu-button + .menu-links { display: flex; }
 
         a {
             text-decoration: none;
@@ -250,23 +276,57 @@
             border-radius: 8px;
         }
 
-        @media (max-width: 800px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 14px;
-            }
-
-            nav {
-                justify-content: center;
-                max-width: 100%;
-            }
-
+        @media (max-width: 1120px) {
+            .header-content { min-height: 66px; }
+            .menu { flex: initial; }
+            .menu-button { display: inline-flex; }
             .menu-links {
-                left: 50%;
-                right: auto;
-                transform: translateX(-50%);
+                display: none;
+                position: absolute;
+                right: 0;
+                top: calc(100% + 12px);
+                width: min(310px, 86vw);
+                padding: 10px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 3px;
+                background: #ffffff;
+                border: 1px solid #d7e9e4;
+                border-radius: 12px;
+                box-shadow: 0 16px 35px rgba(15, 74, 66, .2);
             }
+            .menu-links::before {
+                content: "";
+                position: absolute;
+                right: 20px;
+                top: -6px;
+                width: 12px;
+                height: 12px;
+                background: #ffffff;
+                border-left: 1px solid #d7e9e4;
+                border-top: 1px solid #d7e9e4;
+                transform: rotate(45deg);
+            }
+            .menu-links a {
+                width: 100%;
+                padding: 10px 12px;
+                color: #425c56;
+                box-sizing: border-box;
+                font-size: 13px;
+            }
+            .menu-links a:hover,
+            .menu-links a.activo { color: #0f5f55; background: #eaf7f4; transform: none; }
+            .menu-links .agendar-link {
+                margin: 5px 0 0;
+                color: #ffffff;
+                background: #0f5f55;
+            }
+            .menu-links .agendar-link:hover { color: #ffffff; background: #247f73; }
+            .menu-links .carrito-link { font-size: 13px; }
+            .carrito-contador { position: static; margin-left: auto; border: 0; }
+        }
+
+        @media (max-width: 800px) {
 
             .search-form {
                 grid-template-columns: 1fr;
@@ -275,6 +335,13 @@
             .search-form button {
                 grid-column: auto;
             }
+        }
+
+        @media (max-width: 480px) {
+            .header-content { width: 92%; }
+            .brand-mark { width: 39px; height: 39px; font-size: 19px; }
+            .brand-copy strong { font-size: 15px; }
+            .brand-copy small { font-size: 9px; }
         }
     </style>
 </head>

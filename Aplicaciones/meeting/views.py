@@ -7,18 +7,16 @@ from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from . import models
+from . import forms, models
 from ..customers import models as customers
 from ..pets import forms as pets_forms
 
-'''Vistas de citas: viven embebidas dentro de la mascota del cliente.'''
 
 ESTADOS = dict(models.Citas.EstadosCita.choices)
 TIPOS = dict(models.Citas.TiposCita.choices)
 
 
 def _a_object_id(id_texto):
-    """Convierte el identificador recibido por la URL al ObjectId de Mongo."""
     try:
         return ObjectId(str(id_texto))
     except (InvalidId, TypeError):
@@ -26,7 +24,7 @@ def _a_object_id(id_texto):
 
 
 def _iterar_citas():
-    """Recorre clientes y mascotas devolviendo (cliente, indice, mascota, posicion, cita)."""
+    """Recorre las citas embebidas en las mascotas de cada cliente."""
     for cliente in customers.Cliente.objects.all():
         for indice, mascota in enumerate(cliente.mascotas or []):
             for posicion, cita in enumerate(mascota.get('citas') or []):
@@ -34,7 +32,6 @@ def _iterar_citas():
 
 
 def _buscar_cita(id_cita):
-    """Busca una cita por su _id recorriendo clientes y mascotas."""
     identificador = _a_object_id(id_cita)
     for cliente, indice, mascota, posicion, cita in _iterar_citas():
         if cita.get('_id') == identificador:
@@ -42,81 +39,47 @@ def _buscar_cita(id_cita):
     raise Http404('La cita solicitada no existe')
 
 
-def _buscar_mascota(id_mascota):
-    """Busca una mascota por su _id (para crearle una cita)."""
-    identificador = _a_object_id(id_mascota)
-    for cliente in customers.Cliente.objects.all():
-        for indice, mascota in enumerate(cliente.mascotas or []):
-            if mascota.get('_id') == identificador:
-                return cliente, indice, mascota
-    raise Http404('La mascota solicitada no existe')
+def _buscar_mascota(id_cliente, id_mascota):
+    """Valida que la mascota pertenezca al cliente enviado por el formulario."""
+    cliente_id = _a_object_id(id_cliente)
+    mascota_id = _a_object_id(id_mascota)
+    try:
+        cliente = customers.Cliente.objects.get(pk=cliente_id)
+    except customers.Cliente.DoesNotExist:
+        raise Http404('El propietario seleccionado no existe')
+    for indice, mascota in enumerate(cliente.mascotas or []):
+        if mascota.get('_id') == mascota_id:
+            return cliente, indice, mascota
+    raise Http404('La mascota seleccionada no pertenece al propietario')
+
+
+def _mascota_desde_valor(valor):
+    id_cliente, id_mascota = pets_forms.separar_valor_mascota(valor)
+    if not id_cliente or not id_mascota:
+        raise Http404('Selecciona una mascota válida')
+    return _buscar_mascota(id_cliente, id_mascota)
 
 
 def _guardar_mascota(cliente, indice, mascota):
-    """Reescribe el arreglo de mascotas del cliente y guarda el documento."""
-    lista = list(cliente.mascotas or [])
-    lista[indice] = mascota
-    cliente.mascotas = lista
+    mascotas = list(cliente.mascotas or [])
+    mascotas[indice] = mascota
+    cliente.mascotas = mascotas
     cliente.save()
 
 
-def _fecha_hora(fecha_texto, hora_texto):
-    """Combina la fecha y la hora del formulario en el DateTimeField."""
-    try:
-        fecha = datetime.strptime(fecha_texto, '%Y-%m-%d')
-    except (TypeError, ValueError):
-        fecha = datetime.now()
-    if hora_texto:
-        try:
-            hora = datetime.strptime(hora_texto, '%H:%M').time()
-            fecha = datetime.combine(fecha.date(), hora)
-        except (TypeError, ValueError):
-            pass
-    return timezone.make_aware(fecha)
-
-
-def _hora(hora_texto):
-    """Convierte el texto de la hora en un ``time`` (o None si viene vacío)."""
-    if not hora_texto:
-        return None
-    try:
-        return datetime.strptime(hora_texto, '%H:%M').time()
-    except (TypeError, ValueError):
-        return None
-
-
-def _datos_cita(datos):
-    """Arma el subdocumento completo de la cita con los datos del POST."""
+def _estado_clase(estado):
     return {
-        '_id': ObjectId(),
-        'tipo': datos.get('Tipo') or 'Consulta',
-        'fecha': _fecha_hora(datos.get('FechaCita'), datos.get('HoraCita')),
-        'hora_cita': _hora(datos.get('HoraCita')),
-        'motivo': datos.get('Motivo') or '',
-        'estado': datos.get('Estado') or 'PENDIENTE',
-        'sintomas': datos.get('Sintomas') or '',
-        'notas': datos.get('Notas') or '',
-        'veterinario': datos.get('Veterinario') or '',
-    }
-
-
-def _actualizar_cita(cita, datos):
-    """Copia los datos del POST sobre la cita existente."""
-    cita['tipo'] = datos.get('Tipo') or cita.get('tipo')
-    cita['fecha'] = _fecha_hora(datos.get('FechaCita'), datos.get('HoraCita'))
-    cita['hora_cita'] = _hora(datos.get('HoraCita'))
-    cita['motivo'] = datos.get('Motivo') or ''
-    cita['estado'] = datos.get('Estado') or cita.get('estado')
-    cita['sintomas'] = datos.get('Sintomas') or ''
-    cita['notas'] = datos.get('Notas') or ''
-    cita['veterinario'] = datos.get('Veterinario') or ''
-    return cita
+        models.Citas.EstadosCita.PENDIENTE: 'pendiente',
+        models.Citas.EstadosCita.CONFIRMADA: 'confirmada',
+        models.Citas.EstadosCita.COMPLETADA: 'completada',
+        models.Citas.EstadosCita.CANCELADA: 'cancelada',
+    }.get(estado, 'pendiente')
 
 
 def _cita_para_plantilla(cliente, mascota, cita):
-    """Datos planos de una cita para listados y formularios."""
     return {
         'id': cita.get('_id'),
+        'mascota_id': mascota.get('_id'),
         'mascota': mascota.get('nombre'),
         'valor_mascota': f"{cliente.pk}:{mascota.get('_id')}",
         'especie': mascota.get('especie'),
@@ -129,131 +92,184 @@ def _cita_para_plantilla(cliente, mascota, cita):
         'hora_cita': cita.get('hora_cita'),
         'estado': ESTADOS.get(cita.get('estado'), cita.get('estado')),
         'valor_estado': cita.get('estado'),
-        'sintomas': cita.get('sintomas'),
-        'notas': cita.get('notas'),
-        'motivo': cita.get('motivo'),
-        'veterinario': cita.get('veterinario'),
+        'estado_clase': _estado_clase(cita.get('estado')),
+        'sintomas': cita.get('sintomas') or '',
+        'notas': cita.get('notas') or '',
+        'motivo': cita.get('motivo') or '',
+        'veterinario': cita.get('veterinario') or '',
     }
 
 
-'''Listado de todas las citas'''
-def home_citas(request):
-    citas = []
-    for cliente, indice, mascota, posicion, cita in _iterar_citas():
-        citas.append(_cita_para_plantilla(cliente, mascota, cita))
-    data = {
+def _todas_las_citas():
+    citas = [
+        _cita_para_plantilla(cliente, mascota, cita)
+        for cliente, _, mascota, _, cita in _iterar_citas()
+    ]
+    minimo = timezone.make_aware(
+        datetime(1970, 1, 1), timezone.get_current_timezone())
+    def fecha_orden(item):
+        fecha = item.get('fecha_cita')
+        if not fecha:
+            return minimo
+        if timezone.is_naive(fecha):
+            return timezone.make_aware(fecha, timezone.get_current_timezone())
+        return fecha
+    citas.sort(
+        key=fecha_orden,
+        reverse=True,
+    )
+    return citas
+
+
+def _estadisticas(citas):
+    return {
+        'total': len(citas),
+        'pendientes': sum(c['valor_estado'] == 'PENDIENTE' for c in citas),
+        'confirmadas': sum(c['valor_estado'] == 'CONFIRMADA' for c in citas),
+        'completadas': sum(c['valor_estado'] == 'COMPLETADA' for c in citas),
+    }
+
+
+def _contexto_listado(citas, titulo='Agenda de citas', filtros=None):
+    return {
         'Citas': citas,
         'Total': len(citas),
-        'titulo': 'Todas las Citas',
-        'titlePage': 'Citas'
+        'estadisticas': _estadisticas(citas),
+        'tipos': models.Citas.TiposCita.choices,
+        'estados': models.Citas.EstadosCita.choices,
+        'filtros': filtros or {},
+        'titulo': titulo,
+        'titlePage': 'Citas',
     }
-    return render(request, 'citas-home.html', data)
 
 
-'''Crear una cita para una mascota'''
+def home_citas(request):
+    return render(
+        request, 'citas-home.html', _contexto_listado(_todas_las_citas()))
+
+
 def crear_cita(request):
-    if request.method == 'POST':
-        datos = request.POST
-        id_cliente, id_mascota = pets_forms.separar_valor_mascota(
-            datos.get('Mascota'))
-        if not id_mascota:
-            messages.error(request, 'Selecciona la mascota de la cita.')
-            return redirect('citas:crear_cita')
-        cliente, indice, mascota = _buscar_mascota(id_mascota)
-        cita = _datos_cita(datos)
+    opciones = pets_forms.opciones_mascotas()
+    inicial = {
+        'estado': models.Citas.EstadosCita.PENDIENTE,
+        'fecha': timezone.localdate(),
+    }
+    mascota_inicial = request.GET.get('mascota')
+    if mascota_inicial:
+        inicial['mascota'] = mascota_inicial
+    formulario = forms.CitaForm(
+        request.POST or None, initial=inicial, opciones_mascotas=opciones)
+    if request.method == 'POST' and formulario.is_valid():
+        cliente, indice, mascota = _mascota_desde_valor(
+            formulario.cleaned_data['mascota'])
+        cita = formulario.documento(ObjectId())
         citas = list(mascota.get('citas') or [])
         citas.append(cita)
         mascota['citas'] = citas
         _guardar_mascota(cliente, indice, mascota)
         messages.success(request, 'Cita creada correctamente.')
         return redirect('citas:detalle_cita', id_cita=cita['_id'])
-    data = {
+    return render(request, 'cita-detail.html', {
+        'formulario': formulario,
         'cita': None,
-        'mascotas': pets_forms.opciones_mascotas(),
-        'tipos': models.Citas.TiposCita.choices,
-        'estados': models.Citas.EstadosCita.choices,
-        'titulo': 'Crear Cita',
-        'boton': 'Crear',
-        'titlePage': 'Crear Cita'
-    }
-    return render(request, 'cita-detail.html', data)
+        'titulo': 'Agendar nueva cita',
+        'boton': 'Guardar cita',
+        'titlePage': 'Crear cita',
+    })
 
 
-'''Detalle y edición de una cita'''
 def detalle_cita(request, id_cita):
     cliente, indice, mascota, posicion, cita = _buscar_cita(id_cita)
-    if request.method == 'POST':
-        _actualizar_cita(cita, request.POST)
-        citas = list(mascota.get('citas') or [])
-        citas[posicion] = cita
-        mascota['citas'] = citas
-        _guardar_mascota(cliente, indice, mascota)
-        data = {
-            'cita': _cita_para_plantilla(cliente, mascota, cita),
-            'mascotas': pets_forms.opciones_mascotas(),
-            'tipos': models.Citas.TiposCita.choices,
-            'estados': models.Citas.EstadosCita.choices,
-            'titulo': 'Editar Cita',
-            'boton': 'Actualizar',
-            'titlePage': 'Editar Cita',
-            'mensaje': 'Cita editada exitosamente'
-        }
-        return render(request, 'cita-detail.html', data)
-    data = {
-        'cita': _cita_para_plantilla(cliente, mascota, cita),
-        'mascotas': pets_forms.opciones_mascotas(),
-        'tipos': models.Citas.TiposCita.choices,
-        'estados': models.Citas.EstadosCita.choices,
-        'titulo': 'Editar Cita',
-        'boton': 'Actualizar',
-        'titlePage': 'Editar Cita'
+    cita_vista = _cita_para_plantilla(cliente, mascota, cita)
+    inicial = {
+        'mascota': cita_vista['valor_mascota'],
+        'tipo': cita.get('tipo'),
+        'fecha': cita.get('fecha'),
+        'hora': cita.get('hora_cita'),
+        'estado': cita.get('estado'),
+        'motivo': cita.get('motivo'),
+        'sintomas': cita.get('sintomas'),
+        'notas': cita.get('notas'),
+        'veterinario': cita.get('veterinario'),
     }
-    return render(request, 'cita-detail.html', data)
+    formulario = forms.CitaForm(request.POST or None, initial=inicial)
+    if request.method == 'POST' and formulario.is_valid():
+        destino_cliente, _, destino_mascota = _mascota_desde_valor(
+            formulario.cleaned_data['mascota'])
+        cita_actualizada = formulario.documento(cita.get('_id'))
+        mismo_destino = (
+            str(destino_cliente.pk) == str(cliente.pk)
+            and str(destino_mascota.get('_id')) == str(mascota.get('_id'))
+        )
+        if mismo_destino:
+            citas = list(mascota.get('citas') or [])
+            citas[posicion] = cita_actualizada
+            mascota['citas'] = citas
+            _guardar_mascota(cliente, indice, mascota)
+        else:
+            citas_origen = list(mascota.get('citas') or [])
+            citas_origen.pop(posicion)
+            mascota['citas'] = citas_origen
+            _guardar_mascota(cliente, indice, mascota)
+
+            # Se vuelve a consultar el destino para evitar guardar una copia
+            # anterior si ambas mascotas tienen el mismo propietario.
+            destino_cliente, destino_indice, destino_mascota = (
+                _mascota_desde_valor(formulario.cleaned_data['mascota']))
+            citas_destino = list(destino_mascota.get('citas') or [])
+            citas_destino.append(cita_actualizada)
+            destino_mascota['citas'] = citas_destino
+            _guardar_mascota(destino_cliente, destino_indice, destino_mascota)
+        messages.success(request, 'Cita actualizada correctamente.')
+        return redirect('citas:detalle_cita', id_cita=cita_actualizada['_id'])
+    return render(request, 'cita-detail.html', {
+        'formulario': formulario,
+        'cita': cita_vista,
+        'titulo': 'Detalle de la cita',
+        'boton': 'Guardar cambios',
+        'titlePage': 'Detalle de cita',
+    })
 
 
-'''Formulario de búsqueda de citas'''
 def buscar_cita(request):
-    data = {
+    return render(request, 'cita-search.html', {
         'tipos': models.Citas.TiposCita.choices,
         'estados': models.Citas.EstadosCita.choices,
-        'titlePage': 'Filtrar Citas'
-    }
-    return render(request, 'cita-search.html', data)
+        'titlePage': 'Buscar citas',
+    })
 
 
-'''Filtra las citas por nombre de mascota, tipo y estado'''
 def filtrar_citas(request):
-    nombre = request.GET.get('nombre', '').strip().lower()
-    tipo = request.GET.get('tipo', '')
-    estado = request.GET.get('estado', '')
-    citas = []
-    for cliente, indice, mascota, posicion, cita in _iterar_citas():
-        if nombre and nombre not in (mascota.get('nombre') or '').lower():
-            continue
-        if tipo and cita.get('tipo') != tipo:
-            continue
-        if estado and cita.get('estado') != estado:
-            continue
-        citas.append(_cita_para_plantilla(cliente, mascota, cita))
-    data = {
-        'Citas': citas,
-        'Total': len(citas),
-        'titulo': 'Resultados de búsqueda',
-        'titlePage': 'Citas'
+    filtros = {
+        'nombre': request.GET.get('nombre', '').strip(),
+        'tipo': request.GET.get('tipo', ''),
+        'estado': request.GET.get('estado', ''),
     }
-    return render(request, 'citas-home.html', data)
+    nombre = filtros['nombre'].lower()
+    citas = []
+    for cita in _todas_las_citas():
+        if nombre and nombre not in cita['mascota'].lower():
+            continue
+        if filtros['tipo'] and cita['tipo'] != filtros['tipo']:
+            continue
+        if filtros['estado'] and cita['valor_estado'] != filtros['estado']:
+            continue
+        citas.append(cita)
+    return render(request, 'citas-home.html', _contexto_listado(
+        citas, 'Resultados de búsqueda', filtros))
 
 
-'''Eliminar una cita por su ID'''
 def eliminar_cita(request, id_cita):
-    try:
-        cliente, indice, mascota, posicion, cita = _buscar_cita(id_cita)
+    cliente, indice, mascota, posicion, cita = _buscar_cita(id_cita)
+    cita_vista = _cita_para_plantilla(cliente, mascota, cita)
+    if request.method == 'POST':
         citas = list(mascota.get('citas') or [])
         citas.pop(posicion)
         mascota['citas'] = citas
         _guardar_mascota(cliente, indice, mascota)
-        messages.success(request, 'Cita eliminada exitosamente.')
-    except Http404:
-        messages.error(request, 'La cita no existe o ya fue eliminada.')
-    return redirect('citas:listado_citas')
-
+        messages.success(request, 'Cita eliminada correctamente.')
+        return redirect('citas:listado_citas')
+    return render(request, 'cita-delete.html', {
+        'cita': cita_vista,
+        'titlePage': 'Eliminar cita',
+    })

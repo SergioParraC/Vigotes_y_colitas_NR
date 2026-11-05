@@ -1,53 +1,73 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-    <h1>{{ titulo }}</h1>
+{% include 'citas-styles.html' %}
+<main class="citas-contenedor">
+    <section class="citas-hero">
+        <div class="citas-hero-contenido">
+            <span class="citas-eyebrow">● Centro de atención veterinaria</span>
+            <h1>{{ titulo }}</h1>
+            <p>Organiza las consultas de tus pacientes, revisa la disponibilidad del día y mantén cada atención bajo control.</p>
+            <div class="citas-acciones">
+                <a class="citas-boton citas-boton--claro" href="{% url 'citas:crear_cita' %}"><span>＋</span> Agendar cita</a>
+                <a class="citas-boton citas-boton--transparente" href="{% url 'citas:buscar_cita' %}">⌕ Búsqueda avanzada</a>
+                <a class="citas-boton citas-boton--transparente" href="{% url 'pets:listado_mascotas' %}">🐾 Ver pacientes</a>
+            </div>
+        </div>
+    </section>
+
     {% if messages %}
-        {% for message in messages %}
-            {% if message.tags == 'success' %}
-                <p style="color: green; font-size: 20px;">{{ message }}</p>
-            {% else %}
-                <p style="color: rgb(185, 28, 28); font-size: 20px;">{{ message }}</p>
-            {% endif %}
-        {% endfor %}
+        {% for message in messages %}<div class="citas-mensaje">{{ message }}</div>{% endfor %}
     {% endif %}
 
-    <div style="margin-bottom: 10px;">
-        <a href="{% url 'citas:crear_cita' %}"><button style="background-color: rgb(20, 97, 5); color: white;">Añadir</button></a>
-        <a href="{% url 'citas:buscar_cita' %}"><button style="background-color: rgb(20, 97, 5); color: white;">Filtrar</button></a>
-    </div>
+    <section class="citas-grid-resumen" aria-label="Resumen de citas">
+        <article class="citas-resumen"><div class="citas-resumen-icono">📋</div><div><span>Total</span><strong>{{ estadisticas.total }}</strong></div></article>
+        <article class="citas-resumen citas-resumen--pendiente"><div class="citas-resumen-icono">◷</div><div><span>Pendientes</span><strong>{{ estadisticas.pendientes }}</strong></div></article>
+        <article class="citas-resumen citas-resumen--confirmada"><div class="citas-resumen-icono">✓</div><div><span>Confirmadas</span><strong>{{ estadisticas.confirmadas }}</strong></div></article>
+        <article class="citas-resumen citas-resumen--completada"><div class="citas-resumen-icono">★</div><div><span>Completadas</span><strong>{{ estadisticas.completadas }}</strong></div></article>
+    </section>
 
-    <div style="display: inline-block; margin-left: auto; margin-right: auto;">
-        <table>
-            <tr>
-                <th>Mascota</th>
-                <th>Cliente</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Tipo</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Estado</th>
-                <th>Editar</th>
-            </tr>
+    <section class="citas-panel">
+        <div class="citas-panel-cabecera">
+            <div><h2>Filtrar agenda</h2><p>Encuentra rápidamente una atención programada.</p></div>
+        </div>
+        <form class="citas-filtros" method="get" action="{% url 'citas:filtrar_citas' %}">
+            <div class="citas-campo">
+                <label for="nombre">Nombre de la mascota</label>
+                <input id="nombre" name="nombre" value="{{ filtros.nombre|default:'' }}" placeholder="Ej. Luna">
+            </div>
+            <div class="citas-campo">
+                <label for="tipo">Tipo</label>
+                <select id="tipo" name="tipo"><option value="">Todos</option>{% for valor, texto in tipos %}<option value="{{ valor }}" {% if filtros.tipo == valor %}selected{% endif %}>{{ texto }}</option>{% endfor %}</select>
+            </div>
+            <div class="citas-campo">
+                <label for="estado">Estado</label>
+                <select id="estado" name="estado"><option value="">Todos</option>{% for valor, texto in estados %}<option value="{{ valor }}" {% if filtros.estado == valor %}selected{% endif %}>{{ texto }}</option>{% endfor %}</select>
+            </div>
+            <button class="citas-boton citas-boton--principal" type="submit">⌕ Buscar</button>
+        </form>
+    </section>
+
+    <section class="citas-panel">
+        <div class="citas-panel-cabecera"><div><h2>Próximas atenciones</h2><p>{{ Total }} cita{{ Total|pluralize }} en esta vista.</p></div><a class="citas-boton citas-boton--principal citas-boton--pequeno" href="{% url 'citas:crear_cita' %}">＋ Nueva cita</a></div>
+        <table class="citas-tabla">
+            <thead><tr><th>Paciente</th><th>Fecha</th><th>Servicio</th><th>Propietario</th><th>Veterinario</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
             {% for c in Citas %}
-            <tr>
-                <td>{{ c.mascota }}</td>
-                <td>{{ c.cliente }}</td>
-                <td>{{ c.telefono }}</td>
-                <td>{{ c.email }}</td>
-                <td>{{ c.tipo_display }}</td>
-                <td>{{ c.fecha_cita|date:'Y-m-d' }}</td>
-                <td>{{ c.hora_cita|time:'H:i' }}</td>
-                <td>{{ c.estado }}</td>
-                <td><a href="{% url 'citas:detalle_cita' c.id %}"><button>Editar</button></a></td>
-            </tr>
+                <tr>
+                    <td><div class="citas-paciente"><span class="citas-paciente-avatar">🐾</span><div><strong>{{ c.mascota }}</strong><br><small>{{ c.especie }}</small></div></div></td>
+                    <td class="citas-fecha"><strong>{{ c.fecha_cita|date:'d M Y' }}</strong><small>{{ c.hora_cita|time:'H:i' }}</small></td>
+                    <td>{{ c.tipo_display }}<br><small>{{ c.motivo|truncatechars:36 }}</small></td>
+                    <td>{{ c.cliente }}<br><small>{{ c.telefono }}</small></td>
+                    <td>{{ c.veterinario|default:'Por asignar' }}</td>
+                    <td><span class="estado-cita estado-cita--{{ c.estado_clase }}">{{ c.estado }}</span></td>
+                    <td><div class="acciones"><a class="citas-boton citas-boton--principal citas-boton--pequeno" href="{% url 'citas:detalle_cita' c.id %}">Ver detalle →</a></div></td>
+                </tr>
             {% empty %}
-            <tr>
-                <td colspan="9">No hay citas registradas.</td>
-            </tr>
+                <tr><td class="citas-vacio" colspan="7">No hay citas que coincidan con la búsqueda.</td></tr>
             {% endfor %}
+            </tbody>
         </table>
-        <p style="font-size: 26px; text-align: left;"><strong>Total de citas: {{ Total }}</strong></p>
-    </div>
+    </section>
+</main>
 {% endblock %}

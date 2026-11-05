@@ -1,36 +1,42 @@
 from django.shortcuts import render
 
 from . import forms
+from . import models as customers
+from ..billing import models as billing
+from ..inventory import models as inventory
 
 
-'''Página principal de la veterinaria'''
 def home(request):
-    data = {
+    clientes = list(customers.Cliente.objects.all())
+    total_mascotas = sum(len(cliente.mascotas or []) for cliente in clientes)
+    total_citas = sum(
+        len(mascota.get('citas') or [])
+        for cliente in clientes
+        for mascota in (cliente.mascotas or [])
+    )
+    return render(request, 'home.html', {
         'titlePage': 'Veterinaria Vida Animal',
         'titulo': 'Veterinaria Vida Animal',
-    }
-    return render(request, 'home.html', data)
+        'total_clientes': len(clientes),
+        'total_mascotas': total_mascotas,
+        'total_citas': total_citas,
+        'total_productos': inventory.Productos.objects.count(),
+        'total_facturas': billing.Facturas.objects.count(),
+    })
 
 
-'''Formulario de contacto: guarda el mensaje y confirma el envío'''
 def contacto(request):
     mensaje_contacto = ''
-
     if request.method == 'POST':
         formulario_contacto = forms.ContactoForm(request.POST)
         if formulario_contacto.is_valid():
             formulario_contacto.save()
             mensaje_contacto = 'Tu mensaje fue enviado correctamente.'
-            # Se limpia el formulario para que no queden los datos enviados
             formulario_contacto = forms.ContactoForm()
     else:
         formulario_contacto = forms.ContactoForm()
-
-    data = {
-        'titlePage': 'Contacto',
-        'titulo': 'Contacto',
+    return render(request, 'contacto.html', {
+        'titlePage': 'Contacto', 'titulo': 'Contacto',
         'formulario_contacto': formulario_contacto,
         'mensaje_contacto': mensaje_contacto,
-    }
-    return render(request, 'contacto.html', data)
-
+    })
