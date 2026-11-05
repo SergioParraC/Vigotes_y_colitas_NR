@@ -1,0 +1,61 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+    <h1>{{ titulo }}</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% if mensaje %}
+        <p style="color: green; font-size: 20px;">{{ mensaje }}</p>
+    {% endif %}
+    <a href="{% url 'inventario:listado_productos' %}"><button type="button"; style = "margin-bottom: 10px;">Volver a productos</button></a>
+    
+    <div class="form-container">
+        {% if producto and producto.pk %}
+            <form method="POST" action="{% url 'inventario:guardar_producto' producto.pk %}" enctype="multipart/form-data">
+        {% else %}
+            <form method="POST" action="{% url 'inventario:crear_producto_formulario' %}" enctype="multipart/form-data">
+        {% endif %}
+            {% csrf_token %}
+            <label>{{ formulario.nombre.label }}:</label>
+            {{ formulario.nombre }}
+            <label>{{ formulario.categoria.label }}:</label>
+            {{ formulario.categoria }}
+            <label>{{ formulario.proveedor.label }}:</label>
+            {{ formulario.proveedor }}
+            <label>{{ formulario.descripcion.label }}:</label>
+            {{ formulario.descripcion }}
+            <label>{{ formulario.precio.label }}:</label>
+            {{ formulario.precio }}
+            <label>{{ formulario.cantidad_en_stock.label }}:</label>
+            {{ formulario.cantidad_en_stock }}
+            <label>{{ formulario.imagen.label }}:</label>
+            {% if producto and producto.img %}
+                <img src="{{ producto.img.url }}" alt="Imagen del producto" width="200">
+            {% else %}
+                {{ formulario.imagen }}
+            {% endif %}
+            <button type="submit">{{ boton }}</button>
+        </form>
+    </div>
+    <br>
+
+    {% if producto and producto.pk %}
+        <div class="form-delete"> 
+            <form method="post" action="{% url 'inventario:eliminar_producto' producto.pk %}" onsubmit="return confirmarEliminacion();"> 
+                {% csrf_token %} 
+                <button type="submit" style="background-color:#b91c1c; color:white;">Eliminar producto</button> 
+            </form> 
+        </div>
+    {% endif %}
+
+    <script>
+        function confirmarEliminacion() {
+            return confirm('¿Seguro que quieres eliminar el producto {{ producto.nombre }}?');
+        }
+    </script>
+
+{% endblock %}

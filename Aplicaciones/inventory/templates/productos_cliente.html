@@ -1,0 +1,172 @@
+﻿{% extends 'base/base.html' %}
+
+{% block content %}
+<style>
+	.catalog-wrapper {
+		width: 100%;
+		max-width: 1180px;
+		margin: 0 auto;
+		padding: 20px 16px 32px;
+		box-sizing: border-box;
+	}
+
+	.catalog-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 12px;
+		margin-bottom: 16px;
+	}
+
+	.catalog-grid {
+        margin-top: 16px;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 14px;
+	}
+
+	.product-card {
+		display: grid;
+		grid-template-columns: 240px 1fr;
+		border: 1px solid #8080809f;
+		border-radius: 10px;
+		background: white;
+		overflow: hidden;
+	}
+
+	.product-image-wrap {
+		background: #f3f4f6;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 220px;
+		overflow: hidden;
+	}
+
+	.product-image-wrap img {
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		object-fit: cover;
+		object-position: center;
+		margin: 0;
+		border-radius: 0;
+	}
+
+	.image-empty {
+		font-size: 14px;
+		color: #6b7280;
+	}
+
+	.product-body {
+		padding: 16px 18px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		text-align: left;
+		gap: 8px;
+	}
+
+	.product-name {
+		margin: 0;
+		font-size: 22px;
+		line-height: 1.2;
+	}
+
+	.product-stock {
+		margin: 0;
+		font-size: 15px;
+		color: #15803d;
+		font-weight: 600;
+	}
+
+	.product-stock.low {
+		color: #dc2626;
+	}
+
+	.product-actions {
+		display: flex;
+		gap: 8px;
+		margin-top: 8px;
+		flex-wrap: wrap;
+	}
+
+	.empty-catalog {
+		padding: 40px 16px;
+		border: 1px dashed #cbd5e1;
+		border-radius: 10px;
+		background: #f8fafc;
+		color: #475569;
+		font-size: 18px;
+	}
+    .buy-form-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .buy-qty-input {
+        width: 60px;
+        padding: 4px 6px;
+        border: 1px solid #bdbdbd;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+    .buy-btn {
+        background-color: #0f5f55;
+    }
+    .buy-btn:hover {
+        background-color: #0b4a42;
+    }
+</style>
+
+<div class="catalog-wrapper">
+	<div class="catalog-head">
+		<h1 style="font-size: 32px; margin: 0;">Catálogo de productos</h1>
+		<p style="font-size: 16px; color: #4b5563;">{{ Total }} productos disponibles</p>
+	</div>
+    {% include "filtro_productos.html" %}
+    {% if mensaje %}
+        <p style="color: green;">{{ mensaje }}</p>
+    {% endif %}
+	{% if Productos %}
+	<div class="catalog-grid">
+		{% for producto in Productos %}
+		<article class="product-card">
+			<div class="product-image-wrap">
+				{% if producto.img %}
+					<img src="{{ producto.img.url }}" alt="{{ producto.nombre }}">
+				{% else %}
+					<span class="image-empty">Sin imagen</span>
+				{% endif %}
+			</div>
+
+			<div class="product-body">
+				<h2 class="product-name">{{ producto.nombre }}</h2>
+				<p class="product-name">$ {{ producto.precio }}</p>
+
+				{% if producto.stock <= 10 and producto.stock > 0 %}
+					<p class="product-stock low">Ultimas unidades: {{ producto.stock }}</p>
+				{% else %}
+                    {% if producto.stock <= 0 %}
+                        <p class="product-stock low">Agotado</p>
+                    {% else %}
+                        <p class="product-stock">Disponibles: {{ producto.stock }}</p>
+                    {% endif %}
+				{% endif %}
+
+				<div class="product-actions">
+					<a href="{% url 'inventario:detalle_producto_cliente' producto.pk %}"><button type="button">Ver mas</button></a>
+					{% comment %} El boton de compra depende del modulo de facturacion que aun no esta migrado {% endcomment %}
+				</div>
+			</div>
+		</article>
+		{% endfor %}
+	</div>
+	{% else %}
+	<div class="empty-catalog">
+		No hay productos disponibles por el momento.
+	</div>
+	{% endif %}
+    <a href="{% url 'inventario:listado_productos' %}"><button style="margin-top: 16px;">Editar los productos</button></a>
+</div>
+{% endblock %}

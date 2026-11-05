@@ -1,0 +1,52 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+    <h1>{{ titulo }}</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% if mensaje %}
+        <p style="color: green; font-size: 20px;">{{ mensaje }}</p>
+    {% endif %}
+    <a href="{% url 'inventario:listado_proveedores' %}"><button style="margin-bottom: 10px;">Volver a listado de proveedores</button></a>
+    <div class="form-container">
+        {% if proveedor and proveedor.pk %}
+            <form method="POST" action="{% url 'inventario:guardar_proveedor' proveedor.pk %}">
+        {% else %}
+            <form method="POST" action="{% url 'inventario:crear_proveedor' %}">
+        {% endif %}
+            {% csrf_token %}
+            <label>{{ formulario.nombre.label }}:</label>
+            {{ formulario.nombre }}
+            <label>{{ formulario.contacto.label }}:</label>
+            {{ formulario.contacto }}
+            <label>{{ formulario.telefono.label }}:</label>
+            {{ formulario.telefono }}
+            <label>{{ formulario.email.label }}:</label>
+            {{ formulario.email }}
+            <label>{{ formulario.direccion.label }}:</label>
+            {{ formulario.direccion }}
+            <button type="submit">{{ boton_text }}</button>
+        </form>
+    
+    </div>
+    {% if proveedor and proveedor.pk %}
+        <div class="form-delete"> 
+            <form method="post" action="{% url 'inventario:eliminar_proveedor' proveedor.pk %}" onsubmit="return confirmarEliminacion();"> 
+                {% csrf_token %} 
+                <button type="submit" style="background-color:#b91c1c; color:white;">Eliminar proveedor</button> 
+            </form> 
+        </div>
+
+        <script>
+            function confirmarEliminacion() {
+                return confirm('¿Seguro que quieres eliminar el proveedor {{ proveedor.nombre }}?');
+            }
+        </script>
+    {% endif %}
+    <br>
+
+{% endblock %}

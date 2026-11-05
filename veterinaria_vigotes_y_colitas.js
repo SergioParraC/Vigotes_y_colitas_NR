@@ -30,8 +30,12 @@ db.createCollection("productos", {
 					required: ["nombre"],
 					additionalProperties: false,
                     minProperties: 1,
-                    maxProperties: 2,
+                    maxProperties: 3,
 					properties: {
+						_id: {
+							bsonType: "objectId",
+							description: "Identificador del documento de la categoria referenciada"
+						},
 						nombre: {
 							bsonType: "string",
 							description: "Nombre de la categoria"
@@ -50,7 +54,11 @@ db.createCollection("productos", {
                     minProperties: 5,
                     maxProperties: 10,
 					properties: {
-						razonSocial: {
+						_id: {
+							bsonType: "objectId",
+							description: "Identificador del documento del proveedor referenciado"
+						},
+						nombre: {
 							bsonType: "string",
 							description: "Nombre del proveedor"
 						},

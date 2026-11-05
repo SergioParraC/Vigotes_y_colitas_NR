@@ -1,0 +1,36 @@
+<style>
+    .title {
+		font-size: 28px;
+		line-height: 1.2;
+        margin-bottom: 8px;
+	}
+</style>    
+    
+    <h2 class="title"><strong>Filtrar productos</strong></h2>
+    <div class="search-wrap">
+    <form class="search-form" method="post" action="{% url 'inventario:filtrar_productos' %}">
+        {% csrf_token %}
+        <input type="hidden" name="origen_filtro" value="{{ origen_filtro|default:'inventario' }}">
+        <div class="f">
+            <label>{{ formulario.nombre.label }}:</label>
+            {{ formulario.nombre }}
+        </div>
+
+        <div class="f">
+            <label>{{ formulario.categoria.label }}:</label>
+            {{ formulario.categoria }}
+        </div>
+
+        <div class="f">
+            <label>{{ formulario.precio_minimo.label }}:</label>
+            {{ formulario.precio_minimo }}
+        </div>
+
+        <div class="f">
+            <label>{{ formulario.precio_maximo.label }}:</label>
+            {{ formulario.precio_maximo }}
+        </div>
+
+        <button type="submit">Buscar</button>
+    </form>
+</div>

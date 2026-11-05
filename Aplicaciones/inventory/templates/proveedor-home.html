@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+    <h1>Proveedores registrados</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <div style="margin-bottom: 10px;">
+        <div>
+            <a href="{% url 'inventario:pdf_proveedores' %}"><button>PDF</button></a>
+            <a href="{% url 'inventario:crear_proveedor' %}"><button>Añadir proveedor</button></a>
+            <a href="{% url 'inventario:listado_categorias' %}"><button>Revisar categorías</button></a>
+            <a href="{% url 'inventario:listado_productos' %}"><button>Volver a listado de productos</button></a>
+        </div>
+    </div>
+    <div style="display: inline-block; margin-left: auto; margin-right: auto;">
+        <table>
+            <tr>
+                <th>Nombre</th>
+                <th>Contacto</th>
+                <th>Teléfono</th>
+                <th>Correo electrónico</th>
+                <th>Dirección</th>
+                <th>Editar proveedor</th>
+            </tr>
+            {% for prov in proveedores %}
+            <tr>
+                <td>{{ prov.nombre }}</td>
+                <td>{{ prov.contacto }}</td>
+                <td>{{ prov.telefono }}</td>
+                <td>{{ prov.email }}</td>
+                <td>{{ prov.direccion }}</td>
+                <td><a href="{% url 'inventario:guardar_proveedor' prov.pk %}"><button>Editar</button></a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p style="font-size: 30px; text-align: left;"><strong>Cantidad total de proveedores: {{ total }}</strong></p>
+    </div>
+    
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+    <h1>{{ titulo }}</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% if mensaje %}
+        <p style="color: green; font-size: 20px;">{{ mensaje }}</p>
+    {% endif %}
+    <a href="{% url 'inventario:listado_categorias' %}"><button style="margin-bottom: 10px;">Volver a Categorías</button></a>
+    <div class="form-container">
+        {% if categoria and categoria.pk %}
+            <form method="POST" action="{% url 'inventario:guardar_categoria' categoria.pk %}">
+        {% else %}
+            <form method="POST" action="{% url 'inventario:crear_categoria' %}">
+        {% endif %}
+            {% csrf_token %}
+            <label>{{ formulario.nombre.label }}</label>
+            {{ formulario.nombre }}
+            <label>{{ formulario.descripcion.label }} (opcional):</label>
+            {{ formulario.descripcion }}
+            <button type="submit">{{ boton }}</button>
+        </form>
+    </div>
+    <br>
+
+{% endblock %}

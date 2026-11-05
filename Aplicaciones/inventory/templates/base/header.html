@@ -1,0 +1,28 @@
+
+{% block header %}
+<header>
+	<div class="header-content">
+		<div class="brand">
+			<img src="https://static.vecteezy.com/system/resources/thumbnails/006/470/430/small/modern-animal-pet-logo-template-free-vector.jpg" alt="Logo Veterinaria">
+			<h1>Veterinaria Vida Animal</h1>
+		</div>
+		<nav class="menu">
+			<input type="checkbox" id="menu-toggle" class="menu-toggle">
+			<label for="menu-toggle" class="menu-button">☰ Menú</label>
+			<div class="menu-links">
+				{% if cant_elementos_carrito > 0 %}
+					<a href="/inventario/carrito/mostrar-carrito/"><button>Carrito ({{ cant_elementos_carrito }})</button></a>
+				{% endif %}
+				<a href="/"><button>Inicio</button></a>
+				<a href="/pets/"><button>Mascotas</button></a>
+				<a href="/inventario/listado-productos/"><button>Inventario</button></a>
+				<a href="/inventario/"><button>Productos clientes</button></a>
+				<a href="/inventario/carrito/listar-facturas/"><button>Facturación</button></a>
+				<a href="/citas/"><button>Citas</button></a>
+				<a href="/contacto/"><button>Contacto</button></a>
+				<a href="/users/usuario/"><button>Inicio de sesión</button></a>
+			</div>
+		</nav>
+	</div>
+</header>
+{% endblock %}

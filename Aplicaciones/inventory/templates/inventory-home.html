@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+    <h1>{{ titulo }}</h1>
+    
+    {% if messages %}
+    {% for message in messages %}
+        <div>
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% include "filtro_productos.html" %}
+
+    <div style="margin: 10px;">
+        <a href="{% url 'inventario:pdf_productos' %}"><button>PDF</button></a>
+        <a href="{% url 'inventario:crear_producto_formulario' %}"><button>Añadir nuevo producto</button></a>
+        <a href="{% url 'inventario:listado_proveedores' %}"><button>Revisar proveedores</button></a>
+        {% if volver_menu %}
+            <a href="{% url 'inventario:listado_productos' %}"><button style="background-color: #1AFF2D; color:black;">Volver al listado completo</button></a>
+        {% endif %}
+
+    </div>
+    <div style="display: inline-block; margin-left: auto; margin-right: auto;">
+        <table>
+            <tr>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Proveedor</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Editar producto</th>
+            </tr>
+            {% for pet in Productos %}
+            <tr>
+                <td>{{pet.nombre}}</td>
+                <td>{{ pet.categoria.nombre }}</td>
+                <td>{{ pet.proveedor.nombre }}</td>
+                <td>{{pet.descripcion}}</td>
+                <td>$ {{pet.precio}}</td>
+                {% if pet.stock > 10 %}
+                    <td>{{pet.stock}}</td>
+                {% else %}
+                    <td style="font-weight: bold; color: rgb(255, 92, 92);">{{pet.stock}}</td>
+                {% endif %}
+                <td><a href="{% url 'inventario:guardar_producto' pet.pk %}"><button>Editar</button></a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p style="font-size: 30px; text-align: left;"><strong>Catidad total de productos: {{ Total }}</strong></p>
+    </div>
+
+{% endblock %}

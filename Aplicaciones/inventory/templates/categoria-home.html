@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+    <h1>Categorías</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-size: 20px;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <div style="margin-bottom: 10px;">
+        <a href="{% url 'inventario:listado_proveedores' %}"><button style="background-color: rgb(20, 97, 5); color: white;">Revisar proveedores</button></a>
+        <a href="{% url 'inventario:crear_categoria' %}"><button style="background-color: rgb(20, 97, 5); color: white;">Añadir</button></a>
+    </div>
+    <div style="display: inline-block; margin-left: auto; margin-right: auto;">
+            <table>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Editar categoría</th>
+                </tr>
+                {% for cat in Categorias %}
+                <tr>
+                    <td>{{ cat.nombre }}</td>
+                    <td>{{ cat.descripcion }}</td>
+                    <td><a href="{% url 'inventario:guardar_categoria' cat.pk %}"><button style="background-color: rgb(20, 97, 5); color: #fff;">Editar</button></a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+{% endblock %}

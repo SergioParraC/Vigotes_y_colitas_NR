@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Helvetica, sans-serif; font-size: 12px; }
+            h1 { color: #146105; text-align: center; }
+            .fecha { text-align: right; font-size: 10px; color: #666; margin-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th { background-color: #acffaf; color: #000; padding: 6px 8px; border: 1px solid #000; text-align: left; }
+            td { padding: 5px 8px; border: 1px solid #000; }
+            .total { margin-top: 10px; font-size: 14px; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <h1>Listado de Proveedores</h1>
+        <p class="fecha">Generado: {{ fecha }}</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Dirección</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in proveedores %}
+                    <tr>
+                        <td>{{ p.nombre }}</td>
+                        <td>{{ p.contacto }}</td>
+                        <td>{{ p.telefono }}</td>
+                        <td>{{ p.email }}</td>
+                        <td>{{ p.direccion }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="total">Total de proveedores: {{ cant_proveedores }}</p>
+    </body>
+    </html>
