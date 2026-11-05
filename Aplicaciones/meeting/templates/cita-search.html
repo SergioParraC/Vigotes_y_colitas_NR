@@ -1,32 +1,21 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-    <h1>Filtrar citas</h1>
-
-    <a href="{% url 'citas:listado_citas' %}"><button type="button" style="background-color: rgb(20, 97, 5); color: white; margin-bottom: 10px;">Volver a citas</button></a>
-
-    <div class="form-container">
-        <form method="GET" action="{% url 'citas:filtrar_citas' %}">
-            <label for="nombre">Nombre de la mascota:</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Buscar por nombre de mascota">
-
-            <label for="tipo">Tipo:</label>
-            <select id="tipo" name="tipo">
-                <option value="">Todos</option>
-                {% for valor, texto in tipos %}
-                    <option value="{{ valor }}">{{ texto }}</option>
-                {% endfor %}
-            </select>
-
-            <label for="estado">Estado:</label>
-            <select id="estado" name="estado">
-                <option value="">Todos</option>
-                {% for valor, texto in estados %}
-                    <option value="{{ valor }}">{{ texto }}</option>
-                {% endfor %}
-            </select>
-
-            <button type="submit" style="margin-top: 10px;">Buscar</button>
+{% include 'citas-styles.html' %}
+<main class="citas-contenedor">
+    <section class="citas-hero">
+        <h1>Búsqueda avanzada de citas</h1>
+        <p>Encuentra una consulta por nombre de mascota, tipo de servicio o estado.</p>
+    </section>
+    <section class="citas-formulario">
+        <form method="get" action="{% url 'citas:filtrar_citas' %}">
+            <div class="citas-campo"><label for="nombre">Nombre de la mascota</label><input id="nombre" name="nombre" placeholder="Ej. Luna"></div>
+            <div class="citas-grid-2">
+                <div class="citas-campo"><label for="tipo">Tipo de servicio</label><select id="tipo" name="tipo"><option value="">Todos</option>{% for valor, texto in tipos %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}</select></div>
+                <div class="citas-campo"><label for="estado">Estado</label><select id="estado" name="estado"><option value="">Todos</option>{% for valor, texto in estados %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}</select></div>
+            </div>
+            <div class="citas-acciones"><button class="citas-boton citas-boton--principal" type="submit">Buscar citas</button><a class="citas-boton citas-boton--secundario" href="{% url 'citas:listado_citas' %}">Volver</a></div>
         </form>
-    </div>
+    </section>
+</main>
 {% endblock %}
